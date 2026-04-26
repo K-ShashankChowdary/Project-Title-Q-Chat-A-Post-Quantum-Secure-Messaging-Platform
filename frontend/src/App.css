@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body, #root { height: 100%; }
+  body {
+    @apply bg-navy-950 text-slate-100 antialiased overflow-hidden;
+    font-family: 'Inter', sans-serif;
+  }
+  ::-webkit-scrollbar { @apply w-1; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-white/10 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-white/20; }
+}
+
+@layer components {
+
+  /* ── Backgrounds ── */
+  .bg-grid {
+    @apply fixed inset-0 pointer-events-none z-0;
+    background-image:
+      linear-gradient(rgba(0,200,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,200,255,0.025) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  .orb {
+    @apply absolute rounded-full pointer-events-none;
+    filter: blur(90px);
+    animation: drift 20s ease-in-out infinite alternate;
+  }
+
+  /* ── Glass panels ── */
+  .glass {
+    @apply bg-navy-800/70 backdrop-blur-2xl border border-white/[0.07] rounded-2xl;
+  }
+  .glass-sm {
+    @apply bg-navy-900/80 backdrop-blur-xl border border-white/[0.06] rounded-xl;
+  }
+
+  /* ── Buttons ── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           bg-gradient-to-r from-cyan-400 to-blue-500
+           text-navy-950 font-semibold text-sm
+           px-5 py-2.5 rounded-lg
+           shadow-glow-cyan-sm
+           transition-all duration-200
+           hover:shadow-glow-cyan hover:-translate-y-0.5 hover:brightness-110
+           active:scale-[.97] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2
+           border border-white/10 text-slate-400 text-sm
+           px-3 py-1.5 rounded-lg
+           transition-all duration-200
+           hover:border-cyan-400/40 hover:text-cyan-400 hover:bg-cyan-400/5
+           active:scale-[.97];
+  }
+
+  .btn-icon-send {
+    @apply flex items-center justify-center w-10 h-10 rounded-full flex-shrink-0
+           bg-gradient-to-br from-cyan-400 to-blue-500
+           text-navy-950 shadow-glow-cyan-sm
+           transition-all duration-200
+           hover:shadow-glow-cyan hover:scale-105
+           active:scale-95
+           disabled:opacity-40 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none;
+  }
+
+  /* ── Form fields ── */
+  .field-input {
+    @apply w-full bg-white/[0.04] border border-white/10 rounded-lg
+           px-4 py-3 text-sm text-slate-100 placeholder-slate-500
+           outline-none
+           transition-all duration-200
+           focus:border-cyan-400/60 focus:bg-cyan-400/[0.03]
+           focus:shadow-[0_0_0_3px_rgba(0,200,255,0.12)]
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  /* ── Badges ── */
+  .badge-encrypted {
+    @apply inline-flex items-center gap-1.5
+           bg-emerald-900/40 border border-emerald-500/25
+           text-emerald-400 text-[10px] font-bold tracking-widest uppercase
+           px-2.5 py-1 rounded-full;
+  }
+
+  .badge-pq {
+    @apply inline-flex items-center gap-1.5
+           bg-cyan-400/10 border border-cyan-400/20
+           text-cyan-400 text-[10px] font-bold tracking-widest uppercase
+           px-2.5 py-1 rounded-full;
+  }
+
+  /* ── Message bubbles ── */
+  .bubble-theirs {
+    @apply bg-white/[0.06] border border-white/[0.08]
+           text-slate-100 text-sm leading-relaxed
+           rounded-2xl rounded-bl-sm
+           px-3.5 py-2;
+  }
+
+  .bubble-mine {
+    @apply bg-gradient-to-br from-cyan-400/[0.18] to-blue-500/[0.18]
+           border border-cyan-400/[0.22]
+           text-slate-100 text-sm leading-relaxed
+           rounded-2xl rounded-br-sm
+           px-3.5 py-2;
+  }
+
+  .bubble-error {
+    @apply !bg-rose-500/[0.08] !border-rose-500/[0.2] text-rose-400/80 italic;
+  }
+
+  /* ── User avatar ── */
+  .user-row {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl
+           border border-transparent cursor-pointer
+           transition-all duration-200 relative
+           hover:bg-white/[0.04];
+  }
+  .user-row.active {
+    @apply bg-cyan-400/[0.08] border-cyan-400/20;
+  }
+
+  /* ── Console ── */
+  .console-line {
+    @apply flex gap-3 text-[11px] font-mono border-b border-white/[0.03] pb-1 mb-1;
+  }
+}
+
+@layer utilities {
+  .text-muted { @apply text-slate-500; }
+  .text-sub   { @apply text-slate-400; }
+}
