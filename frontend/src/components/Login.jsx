@@ -43,10 +43,12 @@ export default function Login() {
       } else {
         // We already have a persistent key on this device! 
         // Force the backend to use THIS device's public key (in case they logged in elsewhere recently)
-        await axios.post('/api/auth/update-key',
-          { userId: data.user.id, publicKey: existingPub },
-          { headers: { Authorization: `Bearer ${data.token}` } }
-        );
+        if (data.user.publicKey !== existingPub) {
+          await axios.post('/api/auth/update-key',
+            { userId: data.user.id, publicKey: existingPub },
+            { headers: { Authorization: `Bearer ${data.token}` } }
+          );
+        }
         localStorage.setItem('qchat_user', JSON.stringify({ ...data.user, publicKey: existingPub }));
       }
 

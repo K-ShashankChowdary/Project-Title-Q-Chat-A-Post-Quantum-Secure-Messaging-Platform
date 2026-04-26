@@ -57,6 +57,7 @@ io.on('connection', (socket) => {
   logger.event(`Socket connected`, { socketId: socket.id }, 'Socket');
 
   socket.on('register_socket', async (userId) => {
+    socket.userId = String(userId); // store for O(1) disconnect cleanup
     onlineUsers.set(String(userId), socket.id);
     logger.event('User registered socket', { userId, socketId: socket.id, online: onlineUsers.size }, 'Socket');
     io.emit('user_status', { userId, status: 'online' });
@@ -92,21 +93,24 @@ io.on('connection', (socket) => {
   socket.on('send_message', async ({ toId, fromId, payload, senderPayload }) => {
     logger.event('Relay message', { fromId, toId }, 'Socket');
     try {
+      // Check if recipient is currently connected
+      const toSocket = onlineUsers.get(String(toId));
+      
+      // Save message, mark as delivered immediately if they are online
       const msg = new Message({
         from_user_id:   fromId,
         to_user_id:     toId,
         payload,
-        sender_payload: senderPayload || null
+        sender_payload: senderPayload || null,
+        delivered:      !!toSocket 
       });
       await msg.save();
       logger.info('Message saved', { id: msg._id, fromId, toId }, 'Socket');
 
-      const toSocket = onlineUsers.get(String(toId));
       if (toSocket) {
         io.to(toSocket).emit('new_message', {
           id: msg._id, fromId, payload, timestamp: msg.timestamp
         });
-        await Message.findByIdAndUpdate(msg._id, { delivered: true });
         logger.event('Message delivered', { toId, socketId: toSocket }, 'Socket');
       } else {
         logger.warn('Recipient offline — message persisted for delivery on reconnect', { toId }, 'Socket');
@@ -117,13 +121,12 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', (reason) => {
-    for (const [userId, sid] of onlineUsers.entries()) {
-      if (sid === socket.id) {
-        onlineUsers.delete(userId);
-        logger.event('User disconnected', { userId, reason, remaining: onlineUsers.size }, 'Socket');
-        io.emit('user_status', { userId, status: 'offline' });
-        break;
+    if (socket.userId) {
+      if (onlineUsers.get(socket.userId) === socket.id) {
+        onlineUsers.delete(socket.userId);
       }
+      logger.event('User disconnected', { userId: socket.userId, reason, remaining: onlineUsers.size }, 'Socket');
+      io.emit('user_status', { userId: socket.userId, status: 'offline' });
     }
   });
 

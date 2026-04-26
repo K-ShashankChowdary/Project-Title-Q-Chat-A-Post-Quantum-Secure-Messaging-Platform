@@ -20,7 +20,10 @@ router.get('/:peerId', authenticateToken, async (req, res) => {
         { from_user_id: currentUserId, to_user_id: peerId },
         { from_user_id: peerId, to_user_id: currentUserId }
       ]
-    }).sort({ timestamp: 1 }).skip(offset).limit(limit);
+    }).sort({ timestamp: -1 }).skip(offset).limit(limit);
+
+    // Re-order messages back to chronological order
+    messages.reverse();
 
     logger.info(`Returned ${messages.length} messages`, { peerId }, CTX);
 
